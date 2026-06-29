@@ -5,6 +5,8 @@ exclude =
     migrations
 
 ignore =
+    E402
+    E704
     E501
     E302
     E111
