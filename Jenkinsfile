@@ -1,90 +1,90 @@
-pipeline {
+// pipeline {
 
-    agent any
-
-
-    stages {
+//     agent any
 
 
-        stage('Checkout') {
-
-            steps {
-
-                echo "Building branch ${env.BRANCH_NAME}"
-
-                checkout scm
-
-            }
-
-        }
+//     stages {
 
 
+//         stage('Checkout') {
 
-        stage('Install Dependencies') {
+//             steps {
 
-            steps {
+//                 echo "Building branch ${env.BRANCH_NAME}"
 
-                sh """
+//                 checkout scm
 
-                pip install -r requirements.txt
+//             }
 
-                """
-
-            }
-
-        }
+//         }
 
 
 
-        stage('Test') {
+//         stage('Install Dependencies') {
 
-            steps {
+//             steps {
 
-                sh """
+//                 sh """
 
-                python manage.py test
+//                 pip install -r requirements.txt
 
-                """
+//                 """
 
-            }
+//             }
 
-        }
-
-
-
-        stage('Build') {
-
-            steps {
-
-                echo "Build completed for ${env.BRANCH_NAME}"
-
-            }
-
-        }
-
-
-    }
+//         }
 
 
 
-    post {
+//         stage('Test') {
+
+//             steps {
+
+//                 sh """
+
+//                 python manage.py test
+
+//                 """
+
+//             }
+
+//         }
 
 
-        success {
 
-            echo "SUCCESS: ${env.BRANCH_NAME}"
+//         stage('Build') {
 
-        }
+//             steps {
 
+//                 echo "Build completed for ${env.BRANCH_NAME}"
 
-        failure {
+//             }
 
-            echo "FAILED: ${env.BRANCH_NAME}"
-
-        }
+//         }
 
 
-    }
+//     }
 
 
-}
+
+//     post {
+
+
+//         success {
+
+//             echo "SUCCESS: ${env.BRANCH_NAME}"
+
+//         }
+
+
+//         failure {
+
+//             echo "FAILED: ${env.BRANCH_NAME}"
+
+//         }
+
+
+//     }
+
+
+// }
