@@ -1,90 +1,122 @@
-// pipeline {
+pipeline {
 
-//     agent any
-
-
-//     stages {
+    agent any
 
 
-//         stage('Checkout') {
+    environment {
 
-//             steps {
+        IMAGE="blackroth/hrms"
 
-//                 echo "Building branch ${env.BRANCH_NAME}"
-
-//                 checkout scm
-
-//             }
-
-//         }
+    }
 
 
+    stages {
 
-//         stage('Install Dependencies') {
 
-//             steps {
+        stage('Checkout') {
 
-//                 sh """
+            steps {
 
-//                 pip install -r requirements.txt
+                git branch: 'main',
+                    url: 'https://github.com/MounikaVakacharlla/HRMS-Portal'
 
-//                 """
+            }
 
-//             }
-
-//         }
+        }
 
 
 
-//         stage('Test') {
+        stage('Install') {
 
-//             steps {
+    steps {
 
-//                 sh """
+        sh '''
 
-//                 python manage.py test
+        python3 -m venv venv
 
-//                 """
+        . venv/bin/activate
 
-//             }
+        pip install --upgrade pip
 
-//         }
+        pip install -r requirements.txt
 
+        pip install flake8
 
+        '''
 
-//         stage('Build') {
+    }
 
-//             steps {
-
-//                 echo "Build completed for ${env.BRANCH_NAME}"
-
-//             }
-
-//         }
-
-
-//     }
+}
 
 
 
-//     post {
+        stage('Testing') {
+
+            parallel {
 
 
-//         success {
+                stage('Unit Test') {
 
-//             echo "SUCCESS: ${env.BRANCH_NAME}"
+                    steps {
 
-//         }
+                        sh '''
+
+                        . venv/bin/activate
+
+                        python manage.py test
+
+                        '''
+
+                    }
+
+                }
 
 
-//         failure {
 
-//             echo "FAILED: ${env.BRANCH_NAME}"
+                stage('Lint') {
+                    steps {
+                    sh '''
+                    . venv/bin/activate
+                    flake8 . --exclude=venv
+                    '''
+                        
+                    }
+                    
+                }
 
-//         }
+
+            }
+
+        }
 
 
-//     }
+
+        stage('Docker Build') {
+
+            steps {
+
+                sh '''
+
+                docker build -t ${IMAGE}:${BUILD_NUMBER} .
+
+                '''
+
+            }
+
+        }
 
 
-// }
+
+        stage('Deploy') {
+            steps {
+                sh 'docker-compose up -d'
+            
+            }
+            
+        }
+
+
+    }
+
+
+}
