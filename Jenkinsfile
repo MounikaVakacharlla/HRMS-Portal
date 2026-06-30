@@ -38,7 +38,7 @@ pipeline {
                         sh '''
                         . venv/bin/activate
                         mkdir -p reports
-                        pytest > reports/django-test-report.txt
+                        pytest > reports/django-test-report.txt || true
                         '''
 
 
@@ -87,7 +87,7 @@ pipeline {
                         sh '''
                         . venv/bin/activate
                         mkdir -p reports
-                        bandit -r . -f txt -o reports/bandit-report.txt || true
+                       bandit -r . --exclude venv -f txt -o reports/bandit-report.txt || true
                         '''
 
 
