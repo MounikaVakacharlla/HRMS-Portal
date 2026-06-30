@@ -1,47 +1,55 @@
 pipeline {
 
+
 agent any
+
+
+environment {
+
+IMAGE_NAME="hrms-app"
+
+VERSION="1.0"
+
+}
+
 
 
 stages {
 
 
-stage('Build') {
+
+stage('Git Checkout') {
+
 
 steps {
 
-echo "Building application"
+
+echo "Checking out source code"
+
+checkout scm
+
 
 }
 
-}
-
-
-
-stage('Test') {
-
-steps {
-
-echo "Running tests"
-
-}
 
 }
 
 
 
-stage('Generate Reports') {
+
+stage('Install Dependencies') {
+
 
 steps {
 
 
 sh '''
 
-echo "Build completed" > build.log
+python3 -m venv venv
 
-echo "<coverage>Sample Coverage</coverage>" > coverage.xml
+. venv/bin/activate
 
-echo "<testsuite>Test Report</testsuite>" > test-report.xml
+pip install -r requirements.txt
 
 
 '''
@@ -49,22 +57,26 @@ echo "<testsuite>Test Report</testsuite>" > test-report.xml
 
 }
 
+
 }
 
 
 
-stage('Archive Artifacts') {
+
+stage('Unit Tests') {
 
 
 steps {
 
 
-archiveArtifacts artifacts: '''
-coverage.xml,
-test-report.xml,
-build.log
-''',
-allowEmptyArchive: true
+sh '''
+
+. venv/bin/activate
+
+pytest || true
+
+
+'''
 
 
 }
@@ -73,10 +85,284 @@ allowEmptyArchive: true
 }
 
 
+
+
+stage('Security Scan') {
+
+
+steps {
+
+
+sh '''
+
+bandit -r . --exclude venv || true
+
+
+'''
+
+
 }
 
 
 }
+
+
+
+
+stage('Docker Build') {
+
+
+steps {
+
+
+sh '''
+
+docker build -t $IMAGE_NAME:$VERSION .
+
+
+'''
+
+
+}
+
+
+}
+
+
+
+
+stage('Docker Push') {
+
+
+steps {
+
+
+echo "Pushing Docker image"
+
+
+sh '''
+
+echo "docker push command here"
+
+# docker push $IMAGE_NAME:$VERSION
+
+
+'''
+
+
+}
+
+
+}
+
+
+
+
+stage('Deploy to Staging') {
+
+
+steps {
+
+
+echo "Deploying to Staging"
+
+
+sh '''
+
+docker run -d \
+--name staging-container \
+-p 8000:8000 \
+$IMAGE_NAME:$VERSION
+
+
+'''
+
+
+}
+
+
+}
+
+
+
+
+
+stage('Manual Approval') {
+
+
+steps {
+
+
+input message:
+
+"Deploy to Production?"
+
+
+}
+
+
+}
+
+
+
+
+
+stage('Production Deployment') {
+
+
+steps {
+
+
+echo "Deploying Production"
+
+
+sh '''
+
+docker stop production-container || true
+
+docker rm production-container || true
+
+
+docker run -d \
+--name production-container \
+-p 80:8000 \
+$IMAGE_NAME:$VERSION
+
+
+'''
+
+
+}
+
+
+}
+
+
+
+}
+
+
+
+post {
+
+
+
+failure {
+
+
+echo "Pipeline Failed - Starting Rollback"
+
+
+sh '''
+
+
+docker stop production-container || true
+
+docker rm production-container || true
+
+
+echo "Rollback Completed"
+
+
+'''
+
+
+}
+
+
+
+success {
+
+
+echo "Production Deployment Successful"
+
+
+}
+
+
+
+}
+
+
+}// pipeline {
+
+// agent any
+
+
+// stages {
+
+
+// stage('Build') {
+
+// steps {
+
+// echo "Building application"
+
+// }
+
+// }
+
+
+
+// stage('Test') {
+
+// steps {
+
+// echo "Running tests"
+
+// }
+
+// }
+
+
+
+// stage('Generate Reports') {
+
+// steps {
+
+
+// sh '''
+
+// echo "Build completed" > build.log
+
+// echo "<coverage>Sample Coverage</coverage>" > coverage.xml
+
+// echo "<testsuite>Test Report</testsuite>" > test-report.xml
+
+
+// '''
+
+
+// }
+
+// }
+
+
+
+// stage('Archive Artifacts') {
+
+
+// steps {
+
+
+// archiveArtifacts artifacts: '''
+// coverage.xml,
+// test-report.xml,
+// build.log
+// ''',
+// allowEmptyArchive: true
+
+
+// }
+
+
+// }
+
+
+// }
+
+
+// }
 
 // pipeline {
 //     agent any
