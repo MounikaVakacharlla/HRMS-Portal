@@ -4,5 +4,15 @@ services:
   hrms:
     build: .
     container_name: hrms
+    image: mounikavakacharlla/hrms:latest
+
     ports:
       - "8000:8000"
+
+    restart: unless-stopped
+
+    volumes:
+      - .:/app
+
+    environment:
+      - PYTHONUNBUFFERED=1
