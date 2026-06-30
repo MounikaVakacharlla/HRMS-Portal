@@ -1,1 +1,4 @@
 Django>=5.0
+pytest
+flake8
+bandit
