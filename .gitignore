@@ -1,0 +1,11 @@
+db.sqlite3
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.sqlite3
+venv/
+.env
+reports/
+.pytest_cache/
+EOF

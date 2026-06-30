@@ -1,6 +1,7 @@
 SECRET_KEY="dev"
 DEBUG=True
 ROOT_URLCONF="hrms.urls"
+ALLOWED_HOSTS = ["*"]
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
