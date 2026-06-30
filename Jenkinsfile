@@ -36,6 +36,8 @@ pipeline {
 
 
                         sh '''
+                        . venv/bin/activate
+                        mkdir -p reports
                         pytest > reports/django-test-report.txt
                         '''
 
@@ -58,6 +60,8 @@ pipeline {
 
 
                         sh '''
+                        . venv/bin/activate
+                        mkdir -p reports
                         flake8 . > reports/flake8-report.txt || true
                         '''
 
@@ -81,6 +85,8 @@ pipeline {
 
 
                         sh '''
+                        . venv/bin/activate
+                        mkdir -p reports
                         bandit -r . -f txt -o reports/bandit-report.txt || true
                         '''
 
