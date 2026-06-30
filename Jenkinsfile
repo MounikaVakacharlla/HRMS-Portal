@@ -8,9 +8,8 @@ pipeline {
         DOCKER_CREDS = "dockerhub-creds"
     }
 
-    options {
-        timestamps()
-        ansiColor('xterm')
+ options {
+    timestamps()
     }
 
     stages {
