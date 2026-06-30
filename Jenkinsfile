@@ -1,11 +1,6 @@
 pipeline {
-
     agent any
-
-
     stages {
-
-
         stage('Install Dependencies') {
             steps {
                 sh '''
@@ -17,115 +12,49 @@ pipeline {
             }
         }
 
-
-
         stage('Parallel Testing') {
-
-
             parallel {
-
-
-
                 stage('Django Tests') {
-
-
                     steps {
-
-
                         echo "Running Django Tests"
-
-
                         sh '''
                         . venv/bin/activate
                         mkdir -p reports
                         pytest > reports/django-test-report.txt || true
                         '''
-
-
                     }
-
 
                 }
 
-
-
-
                 stage('Flake8 Code Quality') {
-
-
                     steps {
-
-
                         echo "Running Flake8"
-
-
                         sh '''
                         . venv/bin/activate
                         mkdir -p reports
                         flake8 . > reports/flake8-report.txt || true
                         '''
-
-
                     }
-
-
                 }
-
-
-
-
-
                 stage('Bandit Security Scan') {
-
-
                     steps {
-
-
                         echo "Running Bandit Security Scan"
-
-
                         sh '''
                         . venv/bin/activate
                         mkdir -p reports
                        bandit -r . --exclude venv -f txt -o reports/bandit-report.txt || true
                         '''
-
-
                     }
-
-
                 }
-
-
             }
-
-
         }
-
-
-
-
-
         stage('Collect Reports') {
-
-
             steps {
-
-
                 echo "Collecting Reports"
-
-
                 archiveArtifacts artifacts: 'reports/*', allowEmptyArchive: true
-
-
             }
-
-
         }
-
-
     }
-
 
 }// pipeline {
 
