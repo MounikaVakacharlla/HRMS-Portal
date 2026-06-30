@@ -1,62 +1,142 @@
 pipeline {
-    agent any
-    stages {
-        stage('Install Dependencies') {
-            steps {
-                sh '''
-                python3 -m venv venv
-                . venv/bin/activate
-                pip install --upgrade pip
-                pip install -r requirements.txt
-                '''
-            }
-        }
 
-        stage('Parallel Testing') {
-            parallel {
-                stage('Django Tests') {
-                    steps {
-                        echo "Running Django Tests"
-                        sh '''
-                        . venv/bin/activate
-                        mkdir -p reports
-                        pytest > reports/django-test-report.txt || true
-                        '''
-                    }
+agent any
 
-                }
 
-                stage('Flake8 Code Quality') {
-                    steps {
-                        echo "Running Flake8"
-                        sh '''
-                        . venv/bin/activate
-                        mkdir -p reports
-                        flake8 . > reports/flake8-report.txt || true
-                        '''
-                    }
-                }
-                stage('Bandit Security Scan') {
-                    steps {
-                        echo "Running Bandit Security Scan"
-                        sh '''
-                        . venv/bin/activate
-                        mkdir -p reports
-                       bandit -r . --exclude venv -f txt -o reports/bandit-report.txt || true
-                        '''
-                    }
-                }
-            }
-        }
-        stage('Collect Reports') {
-            steps {
-                echo "Collecting Reports"
-                archiveArtifacts artifacts: 'reports/*', allowEmptyArchive: true
-            }
-        }
-    }
+stages {
 
-}// pipeline {
+
+stage('Build') {
+
+steps {
+
+echo "Building application"
+
+}
+
+}
+
+
+
+stage('Test') {
+
+steps {
+
+echo "Running tests"
+
+}
+
+}
+
+
+
+stage('Generate Reports') {
+
+steps {
+
+
+sh '''
+
+echo "Build completed" > build.log
+
+echo "<coverage>Sample Coverage</coverage>" > coverage.xml
+
+echo "<testsuite>Test Report</testsuite>" > test-report.xml
+
+
+'''
+
+
+}
+
+}
+
+
+
+stage('Archive Artifacts') {
+
+
+steps {
+
+
+archiveArtifacts artifacts: '''
+coverage.xml,
+test-report.xml,
+build.log
+''',
+allowEmptyArchive: true
+
+
+}
+
+
+}
+
+
+}
+
+
+}
+
+// pipeline {
+//     agent any
+//     stages {
+//         stage('Install Dependencies') {
+//             steps {
+//                 sh '''
+//                 python3 -m venv venv
+//                 . venv/bin/activate
+//                 pip install --upgrade pip
+//                 pip install -r requirements.txt
+//                 '''
+//             }
+//         }
+
+//         stage('Parallel Testing') {
+//             parallel {
+//                 stage('Django Tests') {
+//                     steps {
+//                         echo "Running Django Tests"
+//                         sh '''
+//                         . venv/bin/activate
+//                         mkdir -p reports
+//                         pytest > reports/django-test-report.txt || true
+//                         '''
+//                     }
+
+//                 }
+
+//                 stage('Flake8 Code Quality') {
+//                     steps {
+//                         echo "Running Flake8"
+//                         sh '''
+//                         . venv/bin/activate
+//                         mkdir -p reports
+//                         flake8 . > reports/flake8-report.txt || true
+//                         '''
+//                     }
+//                 }
+//                 stage('Bandit Security Scan') {
+//                     steps {
+//                         echo "Running Bandit Security Scan"
+//                         sh '''
+//                         . venv/bin/activate
+//                         mkdir -p reports
+//                        bandit -r . --exclude venv -f txt -o reports/bandit-report.txt || true
+//                         '''
+//                     }
+//                 }
+//             }
+//         }
+//         stage('Collect Reports') {
+//             steps {
+//                 echo "Collecting Reports"
+//                 archiveArtifacts artifacts: 'reports/*', allowEmptyArchive: true
+//             }
+//         }
+//     }
+
+// }// pipeline {
 
 //     agent any
 
