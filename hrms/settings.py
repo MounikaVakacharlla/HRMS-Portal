@@ -3,6 +3,7 @@ DEBUG=True
 ROOT_URLCONF="hrms.urls"
 ALLOWED_HOSTS = ["*"]
 INSTALLED_APPS = [
+    'django_prometheus',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -13,13 +14,25 @@ INSTALLED_APPS = [
     'employees',
 ]
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+'django_prometheus.middleware.PrometheusBeforeMiddleware',
+
+'django.middleware.security.SecurityMiddleware',
+
+'django.contrib.sessions.middleware.SessionMiddleware',
+
+'django.middleware.common.CommonMiddleware',
+
+'django.middleware.csrf.CsrfViewMiddleware',
+
+'django.contrib.auth.middleware.AuthenticationMiddleware',
+
+'django.contrib.messages.middleware.MessageMiddleware',
+
+'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+'django_prometheus.middleware.PrometheusAfterMiddleware',
+
 ]
 DATABASES={"default":{"ENGINE":"django.db.backends.sqlite3","NAME":"db.sqlite3"}}
 STATIC_URL="/static/"
